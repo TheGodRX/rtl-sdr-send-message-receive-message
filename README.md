@@ -1,64 +1,113 @@
 # RTL-SDR Text and Audio Transmission
 
-This repository contains two scripts for transmitting **text messages** and **audio broadcasts** using the **LO leakage** of an RTL-SDR dongle. The scripts leverage the RTL-SDR's local oscillator (LO) to create a very low-power transmitter.
+This repository contains scripts for transmitting and receiving **text messages** and **audio broadcasts** using the **local oscillator (LO) leakage** of an RTL-SDR dongle. While RTL-SDR devices are primarily designed for reception, these scripts exploit LO leakage to allow low-power signal transmission.
+
+## 🛠️ Features
+
+### 📡 Text Transmission
+- **Transmit**: Send text messages using **Frequency Shift Keying (FSK)**.
+- **Receive**: Decode and display text messages using another RTL-SDR dongle.
+
+### 🔊 Audio Broadcast
+- **Transmit**: Send audio (e.g., music or voice) using **Frequency Modulation (FM)**.
+- **Receive**: Play the audio signal using another RTL-SDR dongle or an FM radio receiver.
 
 ---
 
-## Features
+## 📋 Prerequisites
 
-- **Text Transmission**:
-  - Transmit text messages using **Frequency Shift Keying (FSK)**.
-  - Receive and decode text messages using another RTL-SDR.
+### 🧰 Hardware:
+- **RTL-SDR Dongle**: Any **RTL2832U**-based SDR dongle.
+- **Antenna**: A **1-2 ft vertical antenna** for both transmission and reception.
 
-- **Audio Broadcast**:
-  - Transmit audio (e.g., music or voice) using **Frequency Modulation (FM)**.
-  - Receive and play the audio broadcast using another RTL-SDR or an FM radio receiver.
-
----
-
-## Prerequisites
-
-### Hardware
-- **RTL-SDR Dongle**: Any RTL2832U-based SDR dongle.
-- **Antenna**: A vertical antenna (1–2 feet long) for transmission and reception.
-
-### Software
+### 💻 Software:
 - **Linux**: Tested on Ubuntu.
-- **Dependencies**:
-  - `librtlsdr`
-  - `libsndfile` (for audio transmission)
-  - `liquid-dsp` (for modulation/demodulation)
-  - `portaudio` (for audio playback)
+- Required packages:
+    - `librtlsdr` (for RTL-SDR communication)
+    - `libsndfile` (for audio handling)
+    - `liquid-dsp` (for modulation/demodulation)
+    - `portaudio` (for real-time audio playback)
 
-Install the dependencies using:
+---
+
+## 📦 Installation
+
+1. **Install dependencies:**
 ```bash
-sudo apt-get install librtlsdr-dev libsndfile1-dev liquid-dsp portaudio19-dev
-git clone https://github.com/your-username/rtl-sdr-transmission.git
-cd rtl-sdr-transmission
+sudo apt update
+sudo apt install librtlsdr-dev libsndfile1-dev liquid-dsp portaudio19-dev
+
+    Clone the repository:
+
+git clone https://github.com/TheGodRX/rtl-sdr-send-message-receive-message.git
+cd rtl-sdr-send-message-receive-message
+
+    Compile the programs:
+
 gcc -o lo_tx lo_tx.c -lrtlsdr -lm
 gcc -o lo_rx lo_rx.c -lrtlsdr -lm -lliquid
 gcc -o audio_tx audio_tx.c -lrtlsdr -lsndfile -lliquid -lm
 gcc -o audio_rx audio_rx.c -lrtlsdr -lliquid -lportaudio -lm
 
-SEND TEXT
+📨 Sending and Receiving Text Messages
+1. Transmit Text
+
+To send a text message on 3 MHz, run:
+
 ./lo_tx 3000000 "Hello, world!"
 
-RECEIVE TEXT
+    Note: To suppress harmless [R82XX] PLL not locked! messages:
+
+./lo_tx 3000000 "Hello, world!" 2>/dev/null
+
+2. Receive Text
+
+To receive and decode the transmitted message:
+
 ./lo_rx
 
-    Convert your audio file to 48 kHz mono WAV format:
-    ffmpeg -i input.wav -ar 48000 -ac 1 mono_audio.wav
-   Transmit the Audio:
-   ./audio_tx mono_audio.wav
+🔊 Sending and Receiving Audio
+1. Prepare Your Audio File
 
-   Receive the Audio Broadcast:
-  ./audio_rx
+Convert your audio to 48 kHz, mono WAV:
 
+ffmpeg -i input.wav -ar 48000 -ac 1 mono_audio.wav
 
-''''
-The [R82XX] PLL not locked! messages are harmless but can be suppressed by redirecting stderr:
-bash
-Copy
+2. Transmit Audio
 
-./lo_tx "Hello, world!" 2>/dev/null
+Send the audio file on 3 MHz:
 
+./audio_tx mono_audio.wav
+
+3. Receive Audio
+
+Listen to the audio broadcast:
+
+./audio_rx
+
+📡 Simultaneous Transmission & Local Playback
+
+While the RTL-SDR cannot transmit and receive simultaneously, you can monitor your outgoing signal locally.
+For Text Transmission:
+
+./lo_tx 3000000 "Hello, world!" | tee >(cat -)
+
+For Audio Transmission:
+
+./audio_tx mono_audio.wav | tee >(play -t wav -)
+
+🧪 Troubleshooting
+
+    Device Not Found: Ensure your RTL-SDR is properly connected:
+
+rtl_test -t
+
+    Suppress PLL Warnings: Redirect errors to /dev/null:
+
+./lo_tx 3000000 "Hello, world!" 2>/dev/null
+
+📚 Notes
+
+    Ensure legal compliance—unauthorized transmission may violate local regulations.
+    Adjust frequencies carefully to avoid interference with critical systems.
+    Use a suitable antenna to improve range and signal clarity.
