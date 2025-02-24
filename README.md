@@ -52,9 +52,14 @@ gcc -o audio_rx audio_rx.c -lrtlsdr -lliquid -lportaudio -lm
 📨 Sending and Receiving Text Messages
 1. Transmit Text
 
-To send a text message on 3 MHz, run:
+To send a text message on custom frequecy / MHz edit the lo_tx.c & lo_rx.c to have your desired frequency and recompile using the gcc commands listed then, run:
 
-./lo_tx 3000000 "Hello, world!"
+./lo_tx <REPLACE_WITH DESIRED FREQUENCY>"Hello, world!"
+EXAMPLE:  ./lo_tx 3000000 "Hello, world!"
+
+..SET FREQUENCY MUST BE THE SAME AS IN .c FILES BEFORE COMPILATION!
+
+
 
     Note: To suppress harmless [R82XX] PLL not locked! messages:
 
