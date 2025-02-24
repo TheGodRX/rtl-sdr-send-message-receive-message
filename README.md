@@ -76,6 +76,9 @@ ffmpeg -i input.wav -ar 48000 -ac 1 mono_audio.wav
 2. Transmit Audio
 
 Send the audio file on 3 MHz:
+### Sending Audio
+```bash
+sox -v 0.9 audio.wav -t wav -rate 22050 | rtl_fm -f 89M -s 22050 -r 22050 - | tee >(play -t raw -r 22050 -e signed -b 16 -c 1 -)
 
 ./audio_tx mono_audio.wav
 
@@ -84,6 +87,9 @@ Send the audio file on 3 MHz:
 Listen to the audio broadcast:
 
 ./audio_rx
+or
+ rtl_fm -f 89M -s 22050 -r 22050 | play -t raw -r 22050 -e signed -b 16 -c 1 -
+(89M should be chnaged to the freq you want to receive on & vs versa for sending)
 
 📡 Simultaneous Transmission & Local Playback
 
